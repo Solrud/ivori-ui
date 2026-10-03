@@ -1,15 +1,19 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowLeft, Heart, Trash2 } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useFavorites } from '../context/FavoritesContext';
-import { ALL_DRESSES } from '../data/dresses';
+import { useSettings } from '../context/SettingsContext';
 
 export default function Favorites() {
+  const navigate = useNavigate();
+  const { products } = useSettings();
   const { favoriteIds, toggleFavorite, clearFavorites } = useFavorites();
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
   
-  const favoriteDresses = ALL_DRESSES.filter(dress => favoriteIds.includes(dress.id));
+  const favoriteDresses = products.filter(dress => favoriteIds.includes(parseInt(dress.id)));
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ru-RU').format(price) + ' ₽';
@@ -19,8 +23,8 @@ export default function Favorites() {
     <div className="relative min-h-screen text-gray-900">
       <Header />
       
-      <main className="pt-40 px-6 md:px-16 max-w-7xl mx-auto min-h-screen">
-        <Link to="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-8 transition-colors font-sans text-sm tracking-wide">
+      <main className="pt-20 md:pt-24 px-6 md:px-16 max-w-7xl mx-auto min-h-screen">
+        <Link to="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 mb-4 md:mb-6 transition-colors font-sans text-sm tracking-wide">
           <ArrowLeft size={16} />
           <span>На главную</span>
         </Link>
@@ -67,15 +71,20 @@ export default function Favorites() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
+                onClick={() => navigate(`/catalog/${dress.id}`)}
                 className="relative group cursor-pointer"
               >
-                <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-gray-50">
-                  <img
-                    src={dress.image}
-                    alt={dress.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    referrerPolicy="no-referrer"
-                  />
+                <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-transparent">
+                  {dress.image && (
+                    <img
+                      src={dress.image}
+                      onLoad={() => setLoadedImages(prev => ({ ...prev, [dress.id]: true }))}
+                      className={`w-full h-full object-cover transition-all duration-700 group-hover:scale-105 ${
+                        loadedImages[dress.id] ? 'opacity-100' : 'opacity-0'
+                      }`}
+                      referrerPolicy="no-referrer"
+                    />
+                  )}
                   
                   {/* Badges */}
                   {dress.badge && (
@@ -91,7 +100,7 @@ export default function Favorites() {
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      toggleFavorite(dress.id);
+                      toggleFavorite(parseInt(dress.id));
                     }}
                     className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-md rounded-full text-rose-600 hover:bg-white transition-colors border border-gray-200 z-10 shadow-sm"
                   >

@@ -3,22 +3,30 @@ import { motion } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import AnimatedText from './AnimatedText';
 import BookingModal from './BookingModal';
+import { useSettings } from '../context/SettingsContext';
 
 export default function CTA() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [bgLoaded, setBgLoaded] = useState(false);
+  const { settings } = useSettings();
+  const bgImage = settings?.mainPhoto;
 
   return (
     <>
       <section className="relative py-32 md:py-48 px-6 md:px-16 overflow-hidden flex items-center justify-center bg-transparent">
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1594552072238-b8a33785b261?auto=format&fit=crop&q=80&w=2000"
-            alt="Bride fitting"
-            className="w-full h-full object-cover opacity-20 grayscale"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-white via-white/60 to-white" />
-        </div>
+        {bgImage && (
+          <div className="absolute inset-0 z-0">
+            <img
+              src={bgImage}
+              onLoad={() => setBgLoaded(true)}
+              className={`w-full h-full object-cover opacity-20 grayscale transition-opacity duration-1000 ${
+                bgLoaded ? 'opacity-20' : 'opacity-0'
+              }`}
+              referrerPolicy="no-referrer"
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-white via-white/60 to-white" />
+          </div>
+        )}
 
         <div className="relative z-10 text-center max-w-4xl mx-auto">
           <motion.h2
@@ -43,15 +51,18 @@ export default function CTA() {
           </motion.p>
 
           <motion.button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              // setIsModalOpen(true);
+              window.open('https://mst.link/primerka59', '_blank');
+            }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 1, delay: 0.4 }}
-            className="group inline-flex items-center gap-4 bg-rose-500 text-white px-10 py-5 rounded-full font-medium text-lg hover:bg-rose-600 transition-all shadow-md"
+            className="group inline-flex items-center justify-center text-center gap-3 sm:gap-4 bg-rose-500 text-white px-6 sm:px-10 py-4 sm:py-5 rounded-full font-medium text-base sm:text-lg hover:bg-rose-600 transition-all shadow-md max-w-full"
           >
             <AnimatedText text="Записаться на примерку" />
-            <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+            <ArrowRight size={20} className="shrink-0 group-hover:translate-x-2 transition-transform" />
           </motion.button>
         </div>
       </section>

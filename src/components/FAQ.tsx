@@ -41,7 +41,7 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="relative py-24 md:py-32 px-6 md:px-16 bg-transparent">
+    <section id="faq" className="relative pt-10 md:pt-14 pb-20 md:pb-28 px-6 md:px-16 bg-transparent scroll-mt-20">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12 md:mb-16">
           <motion.h2 

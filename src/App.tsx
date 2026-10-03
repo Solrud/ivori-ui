@@ -7,9 +7,13 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import Catalog from './pages/Catalog';
+import ProductDetail from './pages/ProductDetail';
 import Favorites from './pages/Favorites';
+import NotFound from './pages/NotFound';
 import CookieConsent from './components/CookieConsent';
 import { FavoritesProvider } from './context/FavoritesContext';
+import { SettingsProvider } from './context/SettingsContext';
+import AdminApp from './admin/AdminApp';
 
 function ScrollHandler() {
   const { hash, pathname } = useLocation();
@@ -50,22 +54,36 @@ function ScrollHandler() {
 
 export default function App() {
   return (
-    <FavoritesProvider>
-      <BrowserRouter>
-        <ScrollHandler />
-        <div className="relative min-h-screen selection:bg-rose-200 selection:text-gray-900">
-          {/* Static Background */}
-          <div className="bg-dynamic" />
-
+    <SettingsProvider>
+      <FavoritesProvider>
+        <BrowserRouter>
+          <ScrollHandler />
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/catalog" element={<Catalog />} />
-            <Route path="/favorites" element={<Favorites />} />
+            <Route path="/admin/*" element={<AdminApp />} />
+            <Route path="/not-found" element={<NotFound />} />
+            <Route path="*" element={<MainApp />} />
           </Routes>
-          
-          <CookieConsent />
-        </div>
-      </BrowserRouter>
-    </FavoritesProvider>
+        </BrowserRouter>
+      </FavoritesProvider>
+    </SettingsProvider>
+  );
+}
+
+function MainApp() {
+  return (
+    <div className="relative min-h-screen selection:bg-rose-200 selection:text-gray-900">
+      {/* Static Background */}
+      <div className="bg-dynamic" />
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/catalog" element={<Catalog />} />
+        <Route path="/catalog/:id" element={<ProductDetail />} />
+        <Route path="/favorites" element={<Favorites />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      
+      <CookieConsent />
+    </div>
   );
 }
